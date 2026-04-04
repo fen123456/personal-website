@@ -11,16 +11,38 @@ h1 {
   font-weight: bold;
 }
 
-.pos-z {
-  border: 5px;
+.pos-z-bw {
+  border: 3px;
+  border-style: solid;
+  border-color: white black black white;
+}
+
+.neg-z-bw {
+  border: 3px;
+  border-style: solid;
+  border-color: black white white black;
+}
+.pos-z-grey {
+  border: 3px;
   border-style: solid;
   border-color: var(--light-grey) var(--dark-grey) var(--dark-grey) var(--light-grey);
 }
 
-.neg-z {
-  border: 5px;
+.neg-z-grey {
+  border: 3px;
   border-style: solid;
   border-color: var(--dark-grey) var(--light-grey) var(--light-grey) var(--dark-grey);
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+a:visited {
+  color: black;
+}
+a:hover {
+  color: black;
 }
 
 @media (hover: hover) {

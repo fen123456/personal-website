@@ -1,5 +1,5 @@
 <template>
-  <div class="window pos-z">
+  <div class="window pos-z-bw">
     <div class="title-bar">
       <h1>{{ title }}</h1>
     </div>
@@ -29,7 +29,7 @@ export default defineComponent({
 .title-bar {
   background-color: #00f;
   color: white;
-  padding: 3px;
+  padding: 5px;
 }
 .window-contents {
   padding: 5px;
