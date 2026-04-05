@@ -5,7 +5,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <nav>
     <div class="nav-element pos-z-grey">Start</div>
-    <router-link>
+    <router-link to="/">
       <div class="nav-element pos-z-grey">Hello!</div>
     </router-link>
   </nav>
