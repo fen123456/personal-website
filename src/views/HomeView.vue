@@ -1,10 +1,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import TextWindow from '@/components/TextWindow.vue'
+import MinesweeperWindow from '@/components/MinesweeperWindow.vue'
 
 export default defineComponent({
   name: 'HomeView',
-  components: { TextWindow },
+  components: { TextWindow, MinesweeperWindow },
 })
 </script>
 
@@ -13,6 +14,7 @@ export default defineComponent({
     <p>Oh boy this should work.</p>
     <p>Second line</p>
   </TextWindow>
+  <MinesweeperWindow />
 </template>
 
 <style scoped>

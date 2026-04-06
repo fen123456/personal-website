@@ -1,15 +1,3 @@
-<template>
-  <div class="window pos-z-bw">
-    <div class="title-bar">
-      <img v-if="src" :src="src" />
-      <h1>{{ title }}</h1>
-    </div>
-    <div class="window-contents">
-      <slot>Default Component</slot>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
 import { defineComponent, ref, type PropType } from 'vue'
 import notepadIcon from '../assets/notepad-4.png'
@@ -42,9 +30,22 @@ export default defineComponent({
 })
 </script>
 
+<template>
+  <div class="window pos-z-bw">
+    <div class="title-bar">
+      <img v-if="src" :src="src" />
+      <h1>{{ title }}</h1>
+    </div>
+    <div class="window-contents">
+      <slot>Default Component</slot>
+    </div>
+  </div>
+</template>
+
 <style scoped>
 .window {
   background: var(--grey);
+  margin: 10px;
 }
 .title-bar {
   background-color: #00f;
