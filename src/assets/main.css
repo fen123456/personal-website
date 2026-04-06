@@ -12,24 +12,24 @@ h1 {
 }
 
 .pos-z-bw {
-  border: 3px;
+  border: 2px;
   border-style: solid;
   border-color: white black black white;
 }
 
 .neg-z-bw {
-  border: 3px;
+  border: 2px;
   border-style: solid;
   border-color: black white white black;
 }
 .pos-z-grey {
-  border: 3px;
+  border: 2px;
   border-style: solid;
   border-color: var(--light-grey) var(--dark-grey) var(--dark-grey) var(--light-grey);
 }
 
 .neg-z-grey {
-  border: 3px;
+  border: 2px;
   border-style: solid;
   border-color: var(--dark-grey) var(--light-grey) var(--light-grey) var(--dark-grey);
 }

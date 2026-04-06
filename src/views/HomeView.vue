@@ -1,20 +1,18 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
-import WindowFrame from '../components/WindowFrame.vue'
+import TextWindow from '@/components/TextWindow.vue'
 
 export default defineComponent({
   name: 'HomeView',
-  components: { WindowFrame },
+  components: { TextWindow },
 })
 </script>
 
 <template>
-  <WindowFrame title="test" icon="notepad">
-    <div class="text-pane neg-z-grey">
-      Hello! Testing out here.
-      <h2>Oooo</h2>
-    </div>
-  </WindowFrame>
+  <TextWindow title="Hello!">
+    <p>Oh boy this should work.</p>
+    <p>Second line</p>
+  </TextWindow>
 </template>
 
 <style scoped>

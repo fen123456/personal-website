@@ -11,28 +11,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, type PropType } from 'vue'
 import notepadIcon from '../assets/notepad-4.png'
 import minesweeperIcon from '../assets/minesweeper-1.png'
 
 export default defineComponent({
+  name: 'WindowFrame',
   props: {
     title: {
       required: true,
-      type: String,
+      type: String as PropType<string>,
     },
     icon: {
       required: false,
-      type: String,
+      type: String as PropType<string>,
+      default: '',
     },
   },
   setup(props) {
-    const sources = {
+    const sources: {
+      [key: string]: string
+    } = {
       notepad: notepadIcon,
       minesweeper: minesweeperIcon,
     }
     const src = ref<string>('')
-    src.value = sources[props.icon] === undefined ? sources.notepad : sources[props.icon]
+    src.value = sources[props.icon] ?? notepadIcon
     return { src }
   },
 })
