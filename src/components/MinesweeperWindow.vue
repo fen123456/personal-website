@@ -9,7 +9,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <WindowFrame title="Minesweeper" icon="minesweeper">Hello</WindowFrame>
+  <WindowFrame title="Minesweeper" icon="minesweeper">
+    <MinesweeperTile> </MinesweeperTile>
+  </WindowFrame>
 </template>
 
 <style scoped></style>
