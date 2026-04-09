@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 
-import Tile from '@/assets/classes/Tile.ts'
+import Tile from '@/classes/Tile'
 
 export default defineComponent({
   setup() {

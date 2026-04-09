@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, type PropType } from 'vue'
-import notepadIcon from '../assets/notepad-4.png'
-import minesweeperIcon from '../assets/minesweeper-1.png'
+import notepadIcon from '../assets/icons/notepad-4.png'
+import minesweeperIcon from '../assets/icons/minesweeper-1.png'
 
 export default defineComponent({
   name: 'WindowFrame',

@@ -7,12 +7,12 @@
 
 @font-face {
   font-family: MSSansSerif;
-  src: url('MSW98UI-Bold.otf');
+  src: url('fonts/MSW98UI-Bold.otf');
   font-weight: bold;
 }
 @font-face {
   font-family: MSSansSerif;
-  src: url('MSW98UI-Regular.otf');
+  src: url('fonts/MSW98UI-Regular.otf');
   font-weight: normal;
 }
 
