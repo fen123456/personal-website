@@ -7,7 +7,7 @@ export default defineComponent({
   setup() {
     const tile = new Tile(false)
 
-    tile.number = 3
+    tile.number = 2
     tile.reveal()
 
     const src = tile.getSprite()

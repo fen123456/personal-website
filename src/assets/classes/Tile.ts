@@ -32,10 +32,9 @@ class Tile {
     if (!updateNumber) {
       return
     }
-    const count = 0
     this.number = this.neighbours.reduce(
       (number, currentTile) => number + (currentTile.mine ? 1 : 0),
-      count,
+      0,
     )
   }
   reveal() {
