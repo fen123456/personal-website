@@ -12,6 +12,8 @@ const numberTiles: string[] = [tile0, tile1, tile2, tile3, tile4, tile5, tile6, 
 
 import tileFlagged from '@/assets/minesweeper_tiles/tileFlagged.svg'
 import tileUncleared from '@/assets/minesweeper_tiles/tileUncleared.svg'
+import tileExploded from '@/assets/minesweeper_tiles/tileExploded.svg'
+import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
 
 class Tile {
   number: number
@@ -22,7 +24,7 @@ class Tile {
 
   constructor(hasMine: boolean) {
     this.mine = hasMine
-    this.revealed = false
+    this.revealed = true
     this.flagged = false
     this.number = 0
     this.neighbours = []
@@ -47,13 +49,13 @@ class Tile {
   getSprite(gameEnded = false) {
     if (this.revealed) {
       if (this.mine) {
-        return tile1
+        return tileExploded
       } else {
         return numberTiles[this.number]
       }
     } else {
       if (gameEnded && this.mine) {
-        return tile1
+        return tileMine
       }
       return this.flagged ? tileFlagged : tileUncleared
     }
