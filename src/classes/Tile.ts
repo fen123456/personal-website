@@ -16,10 +16,10 @@ import tileExploded from '@/assets/minesweeper_tiles/tileExploded.svg'
 import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
 
 class Tile {
-  number: number
+  mine: boolean
   revealed: boolean
   flagged: boolean
-  mine: boolean
+  number: number
   neighbours: Tile[]
 
   constructor(hasMine: boolean) {
@@ -29,7 +29,7 @@ class Tile {
     this.number = 0
     this.neighbours = []
   }
-  addNeighbours(neighbours: Tile[], updateNumber = true) {
+  addNeighbours(neighbours: Tile[], updateNumber = true): void {
     this.neighbours = neighbours
     if (!updateNumber) {
       return
@@ -39,19 +39,19 @@ class Tile {
       0,
     )
   }
-  reveal() {
+  reveal(): void {
     if (!this.revealed && this.number === 0) {
       this.neighbours.forEach((tile) => tile.reveal())
     }
 
     this.revealed = true
   }
-  getSprite(gameEnded = false) {
+  getSprite(gameEnded = false): string {
     if (this.revealed) {
       if (this.mine) {
         return tileExploded
       } else {
-        return numberTiles[this.number]
+        return numberTiles[this.number] ?? tile0
       }
     } else {
       if (gameEnded && this.mine) {

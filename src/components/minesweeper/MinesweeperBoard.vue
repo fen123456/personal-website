@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, type PropType } from 'vue'
+import { defineComponent, ref, type PropType } from 'vue'
 
 import Tile from '@/classes/Tile'
 import MinesweeperTile from './MinesweeperTile.vue'
@@ -29,10 +29,9 @@ export default defineComponent({
     },
   },
   setup(props) {
+    // coord array for mines
+    const newCoords: number[] = Array<number>(2)
     const mineCoordinates: number[][] = []
-    const tiles: Tile[][] = []
-
-    const newCoords: number[] = [0, 0]
     while (mineCoordinates.length < props.mineCount) {
       newCoords[0] = Math.floor(Math.random() * props.width)
       newCoords[1] = Math.floor(Math.random() * props.height)
@@ -42,15 +41,36 @@ export default defineComponent({
       }
     }
 
+    // setup tiles array with mines in specified places.
+    const tiles = ref<Tile[][]>(Array<Tile[]>(props.height))
     for (let i = 0; i < props.height; i++) {
-      tiles.push(Array.from({ length: props.width }))
+      tiles.value[i] = Array.from({ length: props.width })
       for (let j = 0; j < props.width; j++) {
         //@ts-expect-error ts doesn't recognise that tiles[i] is definitely an array.
-        tiles[i][j] = new Tile(arrayIncludes2D(mineCoordinates, [i, j]))
+        tiles.value[i][j] = new Tile(arrayIncludes2D(mineCoordinates, [i, j]))
       }
     }
 
-    return { tiles }
+    // give tiles neighbours
+    let currentNeighbours: Tile[] = Array<Tile>(0)
+    for (let i = 0; i < props.height; i++) {
+      for (let j = 0; j < props.width; j++) {
+        currentNeighbours = []
+        for (let k = Math.max(i - 1, 0); k < Math.min(i + 2, props.height); k++) {
+          for (let l = Math.max(j - 1, 0); l < Math.min(j + 2, props.width); l++) {
+            if (!(l === i && k === j)) {
+              //@ts-expect-error ts doesn't recognise that we are definitely in range here.
+              currentNeighbours.push(tiles.value[k][l])
+            }
+          }
+        }
+        //@ts-expect-error ts doesn't recognise that we are definitely in range here.
+        tiles.value[i][j].addNeighbours(currentNeighbours)
+      }
+    }
+
+    const widtho = props.width
+    return { tiles, widtho }
   },
 })
 </script>
@@ -58,7 +78,12 @@ export default defineComponent({
 <template>
   <div class="boardContainer">
     <div v-for="(row, i) in tiles" :key="i" class="row">
-      <MinesweeperTile v-for="(tile, j) in row" :key="j" :coordinate="[i, j]" :tile="tile" />
+      <MinesweeperTile
+        v-for="(tile, j) in row"
+        :key="widtho * i + j"
+        :coordinate="[i, j]"
+        :tile="tile"
+      />
     </div>
   </div>
 </template>

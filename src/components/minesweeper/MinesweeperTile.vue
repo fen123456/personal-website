@@ -21,7 +21,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <img class="tileSprite" :src="tileo.getSprite()" alt="" />
+  <img class="tileSprite" :src="tileo.getSprite()" alt="" @click="console.log(tileo.neighbours)" />
 </template>
 
 <style scoped>
