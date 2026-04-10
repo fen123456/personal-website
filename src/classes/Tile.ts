@@ -24,7 +24,7 @@ class Tile {
 
   constructor(hasMine: boolean) {
     this.mine = hasMine
-    this.revealed = true
+    this.revealed = false
     this.flagged = false
     this.number = 0
     this.neighbours = []
@@ -40,11 +40,12 @@ class Tile {
     )
   }
   reveal(): void {
-    if (!this.revealed && this.number === 0) {
+    const cascade = !this.revealed && this.number === 0 && !this.mine
+    this.revealed = true
+
+    if (cascade) {
       this.neighbours.forEach((tile) => tile.reveal())
     }
-
-    this.revealed = true
   }
   getSprite(gameEnded = false): string {
     if (this.revealed) {

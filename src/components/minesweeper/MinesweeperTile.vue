@@ -1,6 +1,6 @@
 <script lang="ts">
 import Tile from '@/classes/Tile'
-import { defineComponent, ref, type PropType } from 'vue'
+import { defineComponent, type PropType } from 'vue'
 
 export default defineComponent({
   props: {
@@ -13,15 +13,20 @@ export default defineComponent({
       type: Tile as PropType<Tile>,
     },
   },
-  setup(props) {
-    const tileo = ref(props.tile)
-    return { tileo }
+  setup(props, ctx) {
+    function handleClick() {
+      if (props.tile.mine) {
+        ctx.emit('gameOver')
+      }
+      props.tile.reveal()
+    }
+    return { handleClick }
   },
 })
 </script>
 
 <template>
-  <img class="tileSprite" :src="tileo.getSprite()" alt="" @click="console.log(tileo.neighbours)" />
+  <img class="tileSprite" :src="tile.getSprite()" alt="" @click="handleClick()" />
 </template>
 
 <style scoped>

@@ -58,19 +58,22 @@ export default defineComponent({
         currentNeighbours = []
         for (let k = Math.max(i - 1, 0); k < Math.min(i + 2, props.height); k++) {
           for (let l = Math.max(j - 1, 0); l < Math.min(j + 2, props.width); l++) {
-            if (!(l === i && k === j)) {
+            if (!(k === i && l === j)) {
               //@ts-expect-error ts doesn't recognise that we are definitely in range here.
               currentNeighbours.push(tiles.value[k][l])
             }
           }
         }
         //@ts-expect-error ts doesn't recognise that we are definitely in range here.
-        tiles.value[i][j].addNeighbours(currentNeighbours)
+        tiles.value[i][j].addNeighbours([...currentNeighbours])
       }
     }
 
-    const widtho = props.width
-    return { tiles, widtho }
+    function gameOver() {
+      console.log('Gaaame over')
+    }
+
+    return { tiles, gameOver }
   },
 })
 </script>
@@ -80,9 +83,10 @@ export default defineComponent({
     <div v-for="(row, i) in tiles" :key="i" class="row">
       <MinesweeperTile
         v-for="(tile, j) in row"
-        :key="widtho * i + j"
+        :key="width * i + j"
         :coordinate="[i, j]"
         :tile="tile"
+        @gameOver="gameOver"
       />
     </div>
   </div>
