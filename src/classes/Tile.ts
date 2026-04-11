@@ -39,12 +39,27 @@ class Tile {
       0,
     )
   }
-  reveal(): void {
+  reveal(secondary = false): void {
     const cascade = !this.revealed && this.number === 0 && !this.mine
-    this.revealed = true
 
+    const flagNeighbours = this.neighbours.reduce(
+      (number, currentTile) => number + (currentTile.flagged ? 1 : 0),
+      0,
+    )
+
+    // chording
+    if (this.revealed && flagNeighbours === this.number && this.number !== 0 && !secondary) {
+      this.neighbours.forEach((tile) => tile.reveal(true))
+    }
+
+    // reveal number
+    if (!this.flagged) {
+      this.revealed = true
+    }
+
+    // cascading 0s
     if (cascade) {
-      this.neighbours.forEach((tile) => tile.reveal())
+      this.neighbours.forEach((tile) => tile.reveal(true))
     }
   }
   getSprite(gameEnded = false): string {
@@ -60,6 +75,9 @@ class Tile {
       }
       return this.flagged ? tileFlagged : tileUncleared
     }
+  }
+  toggleFlag() {
+    this.flagged = !this.flagged
   }
 }
 

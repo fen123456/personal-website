@@ -6,7 +6,7 @@ export default defineComponent({
   props: {
     coordinate: {
       required: true,
-      type: Array<number> as PropType<number[]>,
+      type: Array<number> as PropType<Array<number>>,
     },
     tile: {
       required: true,
@@ -20,13 +20,25 @@ export default defineComponent({
       }
       props.tile.reveal()
     }
-    return { handleClick }
+    function handleRightClick() {
+      props.tile.toggleFlag()
+    }
+
+    return { handleClick, handleRightClick }
   },
 })
 </script>
 
 <template>
-  <img class="tileSprite" :src="tile.getSprite()" alt="" @click="handleClick()" />
+  <img
+    class="tileSprite preventSelect"
+    :src="tile.getSprite()"
+    alt=""
+    @mouseup.left="handleClick()"
+    @click.right="handleRightClick()"
+    oncontextmenu="return false"
+    draggable="false"
+  />
 </template>
 
 <style scoped>
