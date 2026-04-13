@@ -41,14 +41,14 @@ class Tile {
   }
   reveal(secondary = false): void {
     const cascade = !this.revealed && this.number === 0 && !this.mine
-
     const flagNeighbours = this.neighbours.reduce(
       (number, currentTile) => number + (currentTile.flagged ? 1 : 0),
       0,
     )
+    const chord = this.revealed && flagNeighbours === this.number && this.number !== 0 && !secondary
 
     // chording
-    if (this.revealed && flagNeighbours === this.number && this.number !== 0 && !secondary) {
+    if (chord) {
       this.neighbours.forEach((tile) => tile.reveal(true))
     }
 
