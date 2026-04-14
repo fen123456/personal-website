@@ -55,6 +55,7 @@ export default defineComponent({
 
     function setMouseDown(newValue: boolean): void {
       mouseDown.value = newValue
+      console.log(newValue)
     }
 
     return { tiles, gameOver, newGame, mineCount, time, setMouseDown }

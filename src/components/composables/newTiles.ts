@@ -7,14 +7,14 @@ export function newTiles(width: number, height: number, mineCount: number): Tile
   const tiles = Array<Tile[]>(height)
 
   while (mineCoordinates.length < mineCount) {
-    newCoords[0] = Math.floor(Math.random() * width)
-    newCoords[1] = Math.floor(Math.random() * height)
+    newCoords[0] = Math.floor(Math.random() * height)
+    newCoords[1] = Math.floor(Math.random() * width)
 
     if (!arrayIncludes2D(mineCoordinates, newCoords)) {
       mineCoordinates.push([...newCoords])
     }
   }
-
+  console.log(mineCoordinates)
   // setup tiles array with mines in specified places.
   for (let i = 0; i < height; i++) {
     tiles[i] = Array.from({ length: width })

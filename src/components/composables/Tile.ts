@@ -14,6 +14,7 @@ import tileFlagged from '@/assets/minesweeper_tiles/tileFlagged.svg'
 import tileUncleared from '@/assets/minesweeper_tiles/tileUncleared.svg'
 import tileExploded from '@/assets/minesweeper_tiles/tileExploded.svg'
 import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
+import { ClearMethod } from '../types/clearMethod'
 
 export class Tile {
   mine: boolean
@@ -39,27 +40,33 @@ export class Tile {
       0,
     )
   }
-  reveal(secondary = false): void {
+  reveal(clearMethod = ClearMethod.direct): void {
     const cascade = !this.revealed && this.number === 0 && !this.mine
+
     const flagNeighbours = this.neighbours.reduce(
       (number, currentTile) => number + (currentTile.flagged ? 1 : 0),
       0,
     )
-    const chord = this.revealed && flagNeighbours === this.number && this.number !== 0 && !secondary
+    const chord =
+      this.revealed &&
+      flagNeighbours === this.number &&
+      this.number !== 0 &&
+      clearMethod == ClearMethod.direct
 
     // chording
     if (chord) {
-      this.neighbours.forEach((tile) => tile.reveal(true))
+      this.neighbours.forEach((tile) => tile.reveal(ClearMethod.chord))
     }
 
-    // reveal number
-    if (!this.flagged) {
+    // reveal number. unflag if cascading 0s cleared it.
+    if (!this.flagged || clearMethod == ClearMethod.cascade) {
       this.revealed = true
+      this.flagged = false
     }
 
     // cascading 0s
     if (cascade) {
-      this.neighbours.forEach((tile) => tile.reveal(true))
+      this.neighbours.forEach((tile) => tile.reveal(ClearMethod.cascade))
     }
   }
   getSprite(gameEnded = false): string {
@@ -77,7 +84,8 @@ export class Tile {
     }
   }
   toggleFlag() {
-    this.flagged = !this.flagged
+    // can't flag revealed tile
+    this.flagged = !this.flagged && !this.revealed
   }
 }
 
