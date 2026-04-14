@@ -1,5 +1,5 @@
 import { arrayIncludes2D } from './arrayUtils'
-import type Tile from './Tile'
+import Tile from './Tile'
 
 export function newTiles(width: number, height: number, mineCount: number): Tile[][] {
   const newCoords: number[] = Array<number>(2)
@@ -38,7 +38,7 @@ export function newTiles(width: number, height: number, mineCount: number): Tile
         }
       }
       //@ts-expect-error ts doesn't recognise that we are definitely in range here.
-      tiles.value[i][j].addNeighbours([...currentNeighbours])
+      tiles[i][j].addNeighbours([...currentNeighbours])
     }
   }
   return tiles

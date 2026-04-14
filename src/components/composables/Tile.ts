@@ -15,7 +15,7 @@ import tileUncleared from '@/assets/minesweeper_tiles/tileUncleared.svg'
 import tileExploded from '@/assets/minesweeper_tiles/tileExploded.svg'
 import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
 
-class Tile {
+export class Tile {
   mine: boolean
   revealed: boolean
   flagged: boolean

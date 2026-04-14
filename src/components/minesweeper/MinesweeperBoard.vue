@@ -26,7 +26,7 @@ export default defineComponent({
     const gameActive = ref<boolean>(true)
     const mouseDown = ref<boolean>(false)
     const lastStartTime = ref<number>(Date.now())
-
+    console.log(tiles)
     const mineCount = computed(() => {
       return (
         props.mines -
@@ -63,6 +63,10 @@ export default defineComponent({
 </script>
 
 <template>
+  <div class="information">
+    <p>{{ time }}</p>
+    <p>{{ mineCount }}</p>
+  </div>
   <div class="tilesContainer" @mousedown="setMouseDown(true)" @mouseup="setMouseDown(false)">
     <div v-for="(row, i) in tiles" :key="i" class="row">
       <MinesweeperTile
