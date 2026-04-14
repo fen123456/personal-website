@@ -1,5 +1,5 @@
 <script lang="ts">
-import Tile from '@/classes/Tile'
+import Tile from '@/components/composables/Tile'
 import { defineComponent, type PropType } from 'vue'
 
 export default defineComponent({

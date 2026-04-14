@@ -14,7 +14,7 @@ export default defineComponent({
 
 <template>
   <WindowFrame title="Minesweeper" icon="minesweeper">
-    <MinesweeperBoard :width="width" :height="height" :mineCount="mineCount" />
+    <MinesweeperBoard :width="width" :height="height" :mines="mineCount" />
   </WindowFrame>
 </template>
 

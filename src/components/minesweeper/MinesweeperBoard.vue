@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent, ref, type PropType } from 'vue'
+import { computed, defineComponent, ref, type PropType } from 'vue'
 
-import Tile from '@/classes/Tile'
+import Tile from '@/components/composables/Tile'
 import MinesweeperTile from './MinesweeperTile.vue'
-import { newTiles } from '@/classes/newTiles'
+import { newTiles } from '@/components/composables/newTiles'
 
 export default defineComponent({
   components: { MinesweeperTile },
@@ -16,29 +16,54 @@ export default defineComponent({
       required: true,
       type: Number as PropType<number>,
     },
-    mineCount: {
+    mines: {
       required: true,
       type: Number as PropType<number>,
     },
   },
   setup(props) {
-    const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mineCount))
-    // const gameActive = ref(true)
-    // const mouseDown = ref(false)
+    const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mines))
+    const gameActive = ref<boolean>(true)
+    const mouseDown = ref<boolean>(false)
+    const lastStartTime = ref<number>(Date.now())
 
-    // coord array for mines
+    const mineCount = computed(() => {
+      return (
+        props.mines -
+        tiles.value.reduce(
+          (count, tileArray) =>
+            count +
+            tileArray.reduce((secondCount, tile) => secondCount + (tile.flagged ? 1 : 0), 0),
+          0,
+        )
+      )
+    })
 
-    function gameOver() {
-      console.log('Gaaame over')
+    const time = computed(() => {
+      return Date.now() - lastStartTime.value
+    })
+
+    function gameOver(): void {
+      gameActive.value = false
     }
 
-    return { tiles, gameOver }
+    function newGame(): void {
+      gameActive.value = true
+      tiles.value = newTiles(props.width, props.height, props.mines)
+      lastStartTime.value = Date.now() // not intended behaviour - this goes in first click logic
+    }
+
+    function setMouseDown(newValue: boolean): void {
+      mouseDown.value = newValue
+    }
+
+    return { tiles, gameOver, newGame, mineCount, time, setMouseDown }
   },
 })
 </script>
 
 <template>
-  <div class="boardContainer">
+  <div class="tilesContainer" @mousedown="setMouseDown(true)" @mouseup="setMouseDown(false)">
     <div v-for="(row, i) in tiles" :key="i" class="row">
       <MinesweeperTile
         v-for="(tile, j) in row"
