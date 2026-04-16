@@ -14,7 +14,7 @@ export function newTiles(width: number, height: number, mineCount: number): Tile
       mineCoordinates.push([...newCoords])
     }
   }
-  console.log(mineCoordinates)
+
   // setup tiles array with mines in specified places.
   for (let i = 0; i < height; i++) {
     tiles[i] = Array.from({ length: width })

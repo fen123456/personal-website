@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, ref, type PropType } from 'vue'
+import { computed, defineComponent, ref, watch, type PropType } from 'vue'
 
 import Tile from '@/components/composables/Tile'
 import MinesweeperTile from './MinesweeperTile.vue'
@@ -24,9 +24,7 @@ export default defineComponent({
   setup(props) {
     const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mines))
     const gameActive = ref<boolean>(true)
-    const mouseDown = ref<boolean>(false)
     const lastStartTime = ref<number>(Date.now())
-    console.log(tiles)
     const mineCount = computed(() => {
       return (
         props.mines -
@@ -39,8 +37,13 @@ export default defineComponent({
       )
     })
 
-    const time = computed(() => {
-      return Date.now() - lastStartTime.value
+    const timeRefresher = ref(0)
+    setInterval(() => {
+      timeRefresher.value++
+    }, 50)
+    const time = ref(0)
+    watch(timeRefresher, () => {
+      time.value = Math.floor((Date.now() - lastStartTime.value) / 1000)
     })
 
     function gameOver(): void {
@@ -53,12 +56,7 @@ export default defineComponent({
       lastStartTime.value = Date.now() // not intended behaviour - this goes in first click logic
     }
 
-    function setMouseDown(newValue: boolean): void {
-      mouseDown.value = newValue
-      console.log(newValue)
-    }
-
-    return { tiles, gameOver, newGame, mineCount, time, setMouseDown }
+    return { tiles, gameOver, newGame, mineCount, time }
   },
 })
 </script>
@@ -68,7 +66,7 @@ export default defineComponent({
     <p>{{ time }}</p>
     <p>{{ mineCount }}</p>
   </div>
-  <div class="tilesContainer" @mousedown="setMouseDown(true)" @mouseup="setMouseDown(false)">
+  <div class="tilesContainer">
     <div v-for="(row, i) in tiles" :key="i" class="row">
       <MinesweeperTile
         v-for="(tile, j) in row"

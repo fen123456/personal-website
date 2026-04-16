@@ -1,6 +1,6 @@
 <script lang="ts">
 import Tile from '@/components/composables/Tile'
-import { defineComponent, type PropType } from 'vue'
+import { defineComponent, ref, watch, type PropType } from 'vue'
 
 export default defineComponent({
   props: {
@@ -14,6 +14,7 @@ export default defineComponent({
     },
   },
   setup(props, ctx) {
+    // clearing/flagging logic
     function handleClick() {
       if (props.tile.mine) {
         ctx.emit('gameOver')
@@ -24,7 +25,32 @@ export default defineComponent({
       props.tile.toggleFlag()
     }
 
-    return { handleClick, handleRightClick }
+    // held down detection
+    const mouseDown = ref<boolean>(false)
+
+    function setMouseDown(newValue: boolean): void {
+      mouseDown.value = newValue
+    }
+
+    function handleMouseEnter(e: MouseEvent): void {
+      mouseDown.value = e.buttons == 1
+    }
+
+    watch(mouseDown, () => {
+      if (mouseDown.value) {
+        props.tile.mouseDown()
+      } else {
+        props.tile.mouseUp()
+      }
+    })
+
+    return {
+      handleClick,
+      handleRightClick,
+      setMouseDown,
+      mouseDown,
+      handleMouseEnter,
+    }
   },
 })
 </script>
@@ -32,10 +58,16 @@ export default defineComponent({
 <template>
   <img
     class="tileSprite preventSelect"
+    :class="{ green: mouseDown }"
     :src="tile.getSprite()"
+    ref="div"
     alt=""
-    @mouseup.left="handleClick()"
-    @click.right="handleRightClick()"
+    @mouseup.left="handleClick"
+    @mousedown="setMouseDown(true)"
+    @mouseup="setMouseDown(false)"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="setMouseDown(false)"
+    @click.right="handleRightClick"
     oncontextmenu="return false"
     draggable="false"
   />
@@ -44,5 +76,8 @@ export default defineComponent({
 <style scoped>
 .tileSprite {
   display: inline-block;
+}
+.tileSprite:hover {
+  cursor: auto;
 }
 </style>

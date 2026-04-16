@@ -87,6 +87,8 @@ export class Tile {
     // can't flag revealed tile
     this.flagged = !this.flagged && !this.revealed
   }
+  mouseDown() {}
+  mouseUp() {}
 }
 
 export default Tile
