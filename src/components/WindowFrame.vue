@@ -46,6 +46,7 @@ export default defineComponent({
 .window {
   background: var(--grey);
   margin: 10px;
+  max-width: min-content;
 }
 .title-bar {
   background-color: #00f;
@@ -59,6 +60,6 @@ export default defineComponent({
   margin-right: 5px;
 }
 .window-contents {
-  padding: 3px;
+  /* padding: 3px; */
 }
 </style>

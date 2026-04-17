@@ -1,13 +1,13 @@
 <script lang="ts">
 import Tile from '@/components/composables/Tile'
-import { defineComponent, ref, watch, type PropType } from 'vue'
+import { defineComponent, type PropType } from 'vue'
 
 export default defineComponent({
   props: {
-    coordinate: {
-      required: true,
-      type: Array<number> as PropType<Array<number>>,
-    },
+    // coordinate: {
+    //   required: true,
+    //   type: Array<number> as PropType<Array<number>>,
+    // },
     tile: {
       required: true,
       type: Tile as PropType<Tile>,
@@ -19,38 +19,11 @@ export default defineComponent({
       if (props.tile.mine) {
         ctx.emit('gameOver')
       }
+      props.tile.setMouseDown(false)
       props.tile.reveal()
     }
-    function handleRightClick() {
-      props.tile.toggleFlag()
-    }
 
-    // held down detection
-    const mouseDown = ref<boolean>(false)
-
-    function setMouseDown(newValue: boolean): void {
-      mouseDown.value = newValue
-    }
-
-    function handleMouseEnter(e: MouseEvent): void {
-      mouseDown.value = e.buttons == 1
-    }
-
-    watch(mouseDown, () => {
-      if (mouseDown.value) {
-        props.tile.mouseDown()
-      } else {
-        props.tile.mouseUp()
-      }
-    })
-
-    return {
-      handleClick,
-      handleRightClick,
-      setMouseDown,
-      mouseDown,
-      handleMouseEnter,
-    }
+    return { handleClick }
   },
 })
 </script>
@@ -58,16 +31,13 @@ export default defineComponent({
 <template>
   <img
     class="tileSprite preventSelect"
-    :class="{ green: mouseDown }"
     :src="tile.getSprite()"
-    ref="div"
     alt=""
     @mouseup.left="handleClick"
-    @mousedown="setMouseDown(true)"
-    @mouseup="setMouseDown(false)"
-    @mouseenter="handleMouseEnter"
-    @mouseleave="setMouseDown(false)"
-    @click.right="handleRightClick"
+    @mousedown.left="tile.setMouseDown(true)"
+    @mousedown.right="tile.toggleFlag"
+    @mouseenter="tile.setMouseDown($event.buttons == 1)"
+    @mouseleave="tile.setMouseDown(false)"
     oncontextmenu="return false"
     draggable="false"
   />
@@ -75,9 +45,6 @@ export default defineComponent({
 
 <style scoped>
 .tileSprite {
-  display: inline-block;
-}
-.tileSprite:hover {
-  cursor: auto;
+  float: left;
 }
 </style>

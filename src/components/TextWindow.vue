@@ -26,5 +26,7 @@ export default defineComponent({
 .text-pane {
   background-color: white;
   padding: 2px;
+  margin: 3px;
+  width: max-content;
 }
 </style>

@@ -14,12 +14,13 @@ import tileFlagged from '@/assets/minesweeper_tiles/tileFlagged.svg'
 import tileUncleared from '@/assets/minesweeper_tiles/tileUncleared.svg'
 import tileExploded from '@/assets/minesweeper_tiles/tileExploded.svg'
 import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
-import { ClearMethod } from '../types/clearMethod'
+import { ClearMethod } from '../types/ClearMethod'
 
 export class Tile {
   mine: boolean
   revealed: boolean
   flagged: boolean
+  mouseDown: boolean
   number: number
   neighbours: Tile[]
 
@@ -27,6 +28,7 @@ export class Tile {
     this.mine = hasMine
     this.revealed = false
     this.flagged = false
+    this.mouseDown = false
     this.number = 0
     this.neighbours = []
   }
@@ -69,7 +71,18 @@ export class Tile {
       this.neighbours.forEach((tile) => tile.reveal(ClearMethod.cascade))
     }
   }
-  getSprite(gameEnded = false): string {
+  getSprite(gameActive = true): string {
+    // click preview
+    if (!this.revealed && !this.flagged && gameActive) {
+      if (
+        this.neighbours.some((neighbour) => neighbour.mouseDown && neighbour.revealed) ||
+        this.mouseDown
+      ) {
+        return tile0
+      }
+    }
+
+    // basic sprites
     if (this.revealed) {
       if (this.mine) {
         return tileExploded
@@ -77,7 +90,7 @@ export class Tile {
         return numberTiles[this.number] ?? tile0
       }
     } else {
-      if (gameEnded && this.mine) {
+      if (!gameActive && this.mine) {
         return tileMine
       }
       return this.flagged ? tileFlagged : tileUncleared
@@ -87,8 +100,9 @@ export class Tile {
     // can't flag revealed tile
     this.flagged = !this.flagged && !this.revealed
   }
-  mouseDown() {}
-  mouseUp() {}
+  setMouseDown(newValue: boolean): void {
+    this.mouseDown = newValue
+  }
 }
 
 export default Tile
