@@ -46,12 +46,13 @@ export default defineComponent({
 .window {
   background: var(--grey);
   margin: 10px;
-  max-width: min-content;
+  width: min-content;
+  max-width: 100%;
 }
 .title-bar {
   background-color: #00f;
   color: white;
-  padding: 5px;
+  padding: 3px;
   display: flex;
   align-items: center;
 }
@@ -60,6 +61,6 @@ export default defineComponent({
   margin-right: 5px;
 }
 .window-contents {
-  /* padding: 3px; */
+  max-width: 100%;
 }
 </style>

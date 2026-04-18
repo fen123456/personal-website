@@ -61,7 +61,7 @@ export default defineComponent({
 <template>
   <div class="information">
     <div class="timer">{{ time }}</div>
-    <button class="resetButton">:)</button>
+    <button class="resetButton">Click me!</button>
     <div class="minecount">{{ mineCount }}</div>
   </div>
   <div class="tilesContainer">

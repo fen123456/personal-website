@@ -16,17 +16,22 @@ export default defineComponent({
 
 <template>
   <WindowFrame :title="title" icon="notepad">
-    <div class="text-pane neg-z-grey">
-      <slot>Oops!</slot>
+    <div class="text-pane-container">
+      <div class="text-pane neg-z-grey">
+        <slot>Oops!</slot>
+      </div>
     </div>
   </WindowFrame>
 </template>
 
 <style scoped>
+.text-pane-container {
+  padding: 3px;
+}
 .text-pane {
   background-color: white;
   padding: 2px;
-  margin: 3px;
   width: max-content;
+  max-width: 100%;
 }
 </style>

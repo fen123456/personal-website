@@ -3,7 +3,6 @@
 #app {
   margin: 0 auto;
   font-weight: normal;
-  font-family: MSSansSerif;
 }
 
 h1 {
@@ -49,6 +48,27 @@ a:visited {
 }
 a:hover {
   color: black;
+}
+
+button {
+  border: 2px;
+  border-style: solid;
+  border-color: white black black white;
+  background-color: var(--grey);
+  padding: 3px 12px;
+  font-family: inherit;
+  font-size: 1em;
+  justify-content: center;
+}
+button:active {
+  border: 2px;
+  border-style: solid;
+  border-color: black white white black;
+  padding: 4px 11px 2px 13px; /*Shift text down-right one px*/
+}
+button:focus {
+  outline: 1px dotted #000000;
+  outline-offset: -4px;
 }
 
 @media (hover: hover) {
