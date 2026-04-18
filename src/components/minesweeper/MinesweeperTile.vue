@@ -12,10 +12,27 @@ export default defineComponent({
       required: true,
       type: Tile as PropType<Tile>,
     },
+    coordinate: {
+      required: true,
+      type: Array<number> as PropType<Array<number>>,
+    },
+    gameActive: {
+      required: false,
+      type: Boolean as PropType<boolean>,
+      default: true,
+    },
+    firstClick: {
+      required: false,
+      type: Boolean as PropType<boolean>,
+      default: false,
+    },
   },
   setup(props, ctx) {
     // clearing/flagging logic
     function handleClick() {
+      if (props.firstClick) {
+        ctx.emit('firstClick', props.coordinate)
+      }
       if (props.tile.mine) {
         ctx.emit('gameOver')
       }
@@ -31,11 +48,11 @@ export default defineComponent({
 <template>
   <img
     class="tileSprite preventSelect"
-    :src="tile.getSprite()"
+    :src="tile.getSprite(gameActive)"
     alt=""
-    @mouseup.left="handleClick"
+    @mouseup.left="gameActive && handleClick()"
     @mousedown.left="tile.setMouseDown(true)"
-    @mousedown.right="tile.toggleFlag"
+    @mousedown.right="gameActive && tile.toggleFlag()"
     @mouseenter="tile.setMouseDown($event.buttons == 1)"
     @mouseleave="tile.setMouseDown(false)"
     oncontextmenu="return false"

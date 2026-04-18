@@ -1,9 +1,10 @@
 <script lang="ts">
 import { computed, defineComponent, ref, type PropType } from 'vue'
 
-import Tile from '@/components/composables/Tile'
+import Tile from '../composables/Tile'
 import MinesweeperTile from './MinesweeperTile.vue'
-import { newTiles } from '@/components/composables/newTiles'
+import { newTiles } from '../composables/newTiles'
+import { Timer } from '../composables/Timer'
 
 export default defineComponent({
   components: { MinesweeperTile },
@@ -24,7 +25,8 @@ export default defineComponent({
   setup(props) {
     const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mines))
     const gameActive = ref<boolean>(true)
-    const lastStartTime = ref<number>(Date.now())
+    const timer = ref(new Timer())
+    const nextClickFirst = ref(true)
     const mineCount = computed(() => {
       return (
         props.mines -
@@ -37,31 +39,80 @@ export default defineComponent({
       )
     })
 
+    function updateNumbers() {
+      tiles.value.forEach((row) => {
+        row.forEach((tile) => {
+          tile.updateNumber()
+        })
+      })
+    }
+
     // time :D
-    const time = ref(0)
+    const displayTime = ref(0)
     setInterval(() => {
-      time.value = Math.floor((Date.now() - lastStartTime.value) / 1000)
+      displayTime.value = Math.floor(timer.value.getTime() / 1000)
     }, 50)
 
     function gameOver(): void {
       gameActive.value = false
+      timer.value.pause()
     }
 
     function newGame(): void {
       gameActive.value = true
       tiles.value = newTiles(props.width, props.height, props.mines)
-      lastStartTime.value = Date.now() // not intended behaviour - this goes in first click logic
+      timer.value.reset() // need a start in first click logic
+      nextClickFirst.value = true
     }
 
-    return { tiles, gameOver, newGame, mineCount, time }
+    function firstClick(e: [number, number]): void {
+      function randomTile(excludeY: number, excludeX: number): Tile {
+        let newY = Math.floor(Math.random() * props.height)
+        let newX = Math.floor(Math.random() * props.width)
+        while (newY == excludeY && newX == excludeX) {
+          newY = Math.floor(Math.random() * props.height)
+          newX = Math.floor(Math.random() * props.width)
+        }
+        console.log({ newY, newX })
+        //@ts-expect-error Maybe I can set array bounds for TS
+        return tiles.value[newY][newX]
+      }
+
+      timer.value.start()
+      const [i, j] = e
+      //@ts-expect-error man I know this is in range
+      const currentTile = tiles.value[i][j] as Tile
+      console.log(currentTile)
+      if (currentTile.mine) {
+        currentTile.mine = false
+        let newTile = randomTile(i, j)
+        while (newTile.mine) {
+          newTile = randomTile(i, j)
+        }
+        newTile.mine = true
+        updateNumbers()
+      }
+      nextClickFirst.value = false
+    }
+
+    return {
+      tiles,
+      gameOver,
+      newGame,
+      mineCount,
+      displayTime,
+      gameActive,
+      nextClickFirst,
+      firstClick,
+    }
   },
 })
 </script>
 
 <template>
   <div class="information">
-    <div class="timer">{{ time }}</div>
-    <button class="resetButton">Click me!</button>
+    <div class="timer">{{ displayTime }}</div>
+    <button class="resetButton" @click="newGame">Click me!</button>
     <div class="minecount">{{ mineCount }}</div>
   </div>
   <div class="tilesContainer">
@@ -70,7 +121,11 @@ export default defineComponent({
         v-for="(tile, j) in row"
         :key="width * i + j"
         :tile="tile"
+        :gameActive="gameActive"
+        :firstClick="nextClickFirst"
+        :coordinate="[i, j]"
         @gameOver="gameOver"
+        @firstClick="firstClick($event)"
       />
     </div>
   </div>

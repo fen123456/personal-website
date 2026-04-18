@@ -2,8 +2,8 @@ import { arrayIncludes2D } from './arrayUtils'
 import Tile from './Tile'
 
 export function newTiles(width: number, height: number, mineCount: number): Tile[][] {
-  const newCoords: number[] = Array<number>(2)
-  const mineCoordinates: number[][] = []
+  const newCoords: [number, number] = Array<number>(2) as [number, number]
+  const mineCoordinates: [number, number][] = []
   const tiles = Array<Tile[]>(height)
 
   while (mineCoordinates.length < mineCount) {

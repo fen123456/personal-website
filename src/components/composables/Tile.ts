@@ -32,15 +32,18 @@ export class Tile {
     this.number = 0
     this.neighbours = []
   }
+  updateNumber(): void {
+    this.number = this.neighbours.reduce(
+      (number, currentTile) => number + (currentTile.mine ? 1 : 0),
+      0,
+    )
+  }
   addNeighbours(neighbours: Tile[], updateNumber = true): void {
     this.neighbours = neighbours
     if (!updateNumber) {
       return
     }
-    this.number = this.neighbours.reduce(
-      (number, currentTile) => number + (currentTile.mine ? 1 : 0),
-      0,
-    )
+    this.updateNumber()
   }
   reveal(clearMethod = ClearMethod.direct): void {
     const cascade = !this.revealed && this.number === 0 && !this.mine
