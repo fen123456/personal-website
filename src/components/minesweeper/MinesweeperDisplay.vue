@@ -63,7 +63,7 @@ export default defineComponent({
 <style scoped>
 .imagesContainer {
   background-color: black;
-  height: min-content;
+  height: 29px;
 }
 .number {
   display: inline-block;

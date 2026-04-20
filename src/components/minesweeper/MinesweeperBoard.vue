@@ -114,7 +114,7 @@ export default defineComponent({
   <div class="minesweeperContent">
     <div class="information minesweeperElement">
       <MinesweeperDisplay :number="displayTime" :digits="3" class="timer" />
-      <button class="resetButton" @click="newGame">Smile</button>
+      <button class="resetButton" @click="newGame">:)</button>
       <MinesweeperDisplay :number="mineCount" :digits="3" class="minecount" />
     </div>
     <div class="tilesContainer minesweeperElement">
@@ -130,10 +130,6 @@ export default defineComponent({
           @firstClick="firstClick($event)"
         />
       </div>
-    </div>
-    <div class="minesweeperElement">
-      <p>{{ displayTime }}</p>
-      <p>{{ mineCount }}</p>
     </div>
   </div>
 </template>
@@ -158,7 +154,8 @@ export default defineComponent({
 }
 
 .information {
-  min-height: max-content;
+  height: m-content;
+  padding: 3px;
 }
 .timer {
   float: left;
