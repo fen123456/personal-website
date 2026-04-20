@@ -9,16 +9,13 @@ import { RouterLink, RouterView } from 'vue-router'
       <div class="nav-element pos-z-grey">Hello!</div>
     </router-link>
   </nav>
-  <div class="body">
+  <div class="routerView">
     <RouterView />
   </div>
 </template>
 
 <style scoped>
-.body {
-  background-color: #008080;
-  height: 100vh;
-  width: 100vw;
+.routerView {
   padding: 10vh 10vw;
 }
 

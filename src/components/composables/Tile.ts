@@ -32,12 +32,14 @@ export class Tile {
     this.number = 0
     this.neighbours = []
   }
+
   updateNumber(): void {
     this.number = this.neighbours.reduce(
       (number, currentTile) => number + (currentTile.mine ? 1 : 0),
       0,
     )
   }
+
   addNeighbours(neighbours: Tile[], updateNumber = true): void {
     this.neighbours = neighbours
     if (!updateNumber) {
@@ -45,7 +47,12 @@ export class Tile {
     }
     this.updateNumber()
   }
+
   reveal(clearMethod = ClearMethod.direct): void {
+    if (this.mine) {
+    }
+
+    // setting up booleans
     const cascade = !this.revealed && this.number === 0 && !this.mine
 
     const flagNeighbours = this.neighbours.reduce(
@@ -56,7 +63,7 @@ export class Tile {
       this.revealed &&
       flagNeighbours === this.number &&
       this.number !== 0 &&
-      clearMethod == ClearMethod.direct
+      clearMethod === ClearMethod.direct
 
     // chording
     if (chord) {
@@ -74,6 +81,7 @@ export class Tile {
       this.neighbours.forEach((tile) => tile.reveal(ClearMethod.cascade))
     }
   }
+
   getSprite(gameActive = true): string {
     // click preview
     if (!this.revealed && !this.flagged && gameActive) {

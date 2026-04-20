@@ -6,7 +6,7 @@
 }
 
 h1 {
-  font-size: 20px;
+  font-size: 1em;
   font-weight: bold;
 }
 
@@ -22,13 +22,11 @@ h1 {
   border-color: black white white black;
 }
 .pos-z-grey {
-  border: 2px;
   border-style: solid;
   border-color: var(--light-grey) var(--dark-grey) var(--dark-grey) var(--light-grey);
 }
 
 .neg-z-grey {
-  border: 2px;
   border-style: solid;
   border-color: var(--dark-grey) var(--light-grey) var(--light-grey) var(--dark-grey);
 }
@@ -69,6 +67,11 @@ button:active {
 button:focus {
   outline: 1px dotted #000000;
   outline-offset: -4px;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 @media (hover: hover) {

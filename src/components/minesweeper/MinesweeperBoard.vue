@@ -3,11 +3,12 @@ import { computed, defineComponent, ref, type PropType } from 'vue'
 
 import Tile from '../composables/Tile'
 import MinesweeperTile from './MinesweeperTile.vue'
+import MinesweeperDisplay from './MinesweeperDisplay.vue'
 import { newTiles } from '../composables/newTiles'
 import { Timer } from '../composables/Timer'
 
 export default defineComponent({
-  components: { MinesweeperTile },
+  components: { MinesweeperTile, MinesweeperDisplay },
   props: {
     width: {
       required: true,
@@ -65,7 +66,7 @@ export default defineComponent({
       nextClickFirst.value = true
     }
 
-    function firstClick(e: [number, number]): void {
+    function firstClick(coordinate: [number, number]): void {
       function randomTile(excludeY: number, excludeX: number): Tile {
         let newY = Math.floor(Math.random() * props.height)
         let newX = Math.floor(Math.random() * props.width)
@@ -79,7 +80,7 @@ export default defineComponent({
       }
 
       timer.value.start()
-      const [i, j] = e
+      const [i, j] = coordinate
       //@ts-expect-error man I know this is in range
       const currentTile = tiles.value[i][j] as Tile
       console.log(currentTile)
@@ -110,33 +111,55 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="information">
-    <div class="timer">{{ displayTime }}</div>
-    <button class="resetButton" @click="newGame">Click me!</button>
-    <div class="minecount">{{ mineCount }}</div>
-  </div>
-  <div class="tilesContainer">
-    <div v-for="(row, i) in tiles" :key="i" class="row">
-      <MinesweeperTile
-        v-for="(tile, j) in row"
-        :key="width * i + j"
-        :tile="tile"
-        :gameActive="gameActive"
-        :firstClick="nextClickFirst"
-        :coordinate="[i, j]"
-        @gameOver="gameOver"
-        @firstClick="firstClick($event)"
-      />
+  <div class="minesweeperContent">
+    <div class="information minesweeperElement">
+      <MinesweeperDisplay :number="displayTime" :digits="3" class="timer" />
+      <button class="resetButton" @click="newGame">Smile</button>
+      <MinesweeperDisplay :number="mineCount" :digits="3" class="minecount" />
+    </div>
+    <div class="tilesContainer minesweeperElement">
+      <div v-for="(row, i) in tiles" :key="i" class="row">
+        <MinesweeperTile
+          v-for="(tile, j) in row"
+          :key="width * i + j"
+          :tile="tile"
+          :gameActive="gameActive"
+          :firstClick="nextClickFirst"
+          :coordinate="[i, j]"
+          @gameOver="gameOver"
+          @firstClick="firstClick($event)"
+        />
+      </div>
+    </div>
+    <div class="minesweeperElement">
+      <p>{{ displayTime }}</p>
+      <p>{{ mineCount }}</p>
     </div>
   </div>
 </template>
 
 <style scoped>
+.minesweeperContent {
+  background-color: var(--minesweeper2);
+  border-style: solid;
+  border-color: var(--minesweeper3) var(--minesweeper1) var(--minesweeper1) var(--minesweeper3);
+  border-width: 5px;
+}
+.minesweeperElement {
+  border-color: var(--minesweeper1) var(--minesweeper3) var(--minesweeper3) var(--minesweeper1);
+  border-style: solid;
+  border-width: 5px;
+  margin: 10px 5px;
+}
+
 .row {
   height: 16px;
   width: max-content;
 }
 
+.information {
+  min-height: max-content;
+}
 .timer {
   float: left;
 }

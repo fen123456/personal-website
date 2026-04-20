@@ -7,7 +7,7 @@ export default defineComponent({
   name: 'MinesweeperWindow',
   components: { WindowFrame, MinesweeperBoard },
   setup() {
-    return { width: 30, height: 16, mineCount: 99 }
+    return { width: 10, height: 10, mineCount: 10 }
   },
 })
 </script>

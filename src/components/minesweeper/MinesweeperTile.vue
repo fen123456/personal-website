@@ -4,10 +4,6 @@ import { defineComponent, type PropType } from 'vue'
 
 export default defineComponent({
   props: {
-    // coordinate: {
-    //   required: true,
-    //   type: Array<number> as PropType<Array<number>>,
-    // },
     tile: {
       required: true,
       type: Tile as PropType<Tile>,
@@ -53,7 +49,7 @@ export default defineComponent({
     @mouseup.left="gameActive && handleClick()"
     @mousedown.left="tile.setMouseDown(true)"
     @mousedown.right="gameActive && tile.toggleFlag()"
-    @mouseenter="tile.setMouseDown($event.buttons == 1)"
+    @mouseenter="tile.setMouseDown($event.buttons === 1)"
     @mouseleave="tile.setMouseDown(false)"
     oncontextmenu="return false"
     draggable="false"

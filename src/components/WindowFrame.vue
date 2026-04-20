@@ -48,6 +48,7 @@ export default defineComponent({
   margin: 10px;
   width: min-content;
   max-width: 100%;
+  border-width: 2px;
 }
 .title-bar {
   background-color: #00f;

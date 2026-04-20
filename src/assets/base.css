@@ -2,6 +2,10 @@
   --dark-grey: #737373;
   --grey: #adadad;
   --light-grey: #e5e5e5;
+
+  --minesweeper1: #808080;
+  --minesweeper2: #c0c0c0;
+  --minesweeper3: #ffffff;
 }
 /*For minesweeper this is 888 CCC FFF?*/
 
@@ -37,8 +41,8 @@ body {
   min-height: 100vh;
   line-height: 1.6;
   font-family: MSSansSerif;
-  /*font-family:
-  font-size: 15px;
+  background-color: #008080;
+  /*+font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;*/
