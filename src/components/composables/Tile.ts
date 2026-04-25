@@ -15,22 +15,26 @@ import tileUncleared from '@/assets/minesweeper_tiles/tileUncleared.svg'
 import tileExploded from '@/assets/minesweeper_tiles/tileExploded.svg'
 import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
 import { ClearMethod } from '../types/ClearMethod'
+import type { GameState } from '../types/GameState'
+import type { Ref } from 'vue'
 
 export class Tile {
   mine: boolean
-  revealed: boolean
-  flagged: boolean
-  mouseDown: boolean
-  number: number
-  neighbours: Tile[]
+  revealed: boolean = false
+  flagged: boolean = false
+  mouseDown: boolean = false
+  number: number = 0
+  neighbours: Tile[] = []
+  gameState: Ref<GameState> | null
 
-  constructor(hasMine: boolean) {
+  constructor(hasMine: boolean, gameState: Ref<GameState> | null = null) {
     this.mine = hasMine
-    this.revealed = false
-    this.flagged = false
-    this.mouseDown = false
-    this.number = 0
-    this.neighbours = []
+    this.gameState = gameState
+  }
+
+  // assume game is active if no gameState passed to tile.
+  gameActive(): boolean {
+    return this.gameState ? this.gameState.value.gameActive : true
   }
 
   updateNumber(): void {
@@ -82,9 +86,9 @@ export class Tile {
     }
   }
 
-  getSprite(gameActive = true): string {
+  getSprite(): string {
     // click preview
-    if (!this.revealed && !this.flagged && gameActive) {
+    if (!this.revealed && !this.flagged && this.gameActive()) {
       if (
         this.neighbours.some((neighbour) => neighbour.mouseDown && neighbour.revealed) ||
         this.mouseDown
@@ -101,16 +105,38 @@ export class Tile {
         return numberTiles[this.number] ?? tile0
       }
     } else {
-      if (!gameActive && this.mine) {
+      if (!this.gameActive() && this.mine) {
         return tileMine
       }
       return this.flagged ? tileFlagged : tileUncleared
     }
   }
-  toggleFlag() {
+
+  // on right-click function
+  toggleFlag(): void {
+    if (!this.gameActive()) {
+      return
+    }
     // can't flag revealed tile
     this.flagged = !this.flagged && !this.revealed
   }
+
+  // on left-click function (specifically on release)
+  handleLeftClick(): void {
+    // these values are watched in the board that the gameState belongs to.
+    if (this.gameState) {
+      if (this.gameState.value.nextClickFirst) {
+        this.gameState.value.nextClickFirst = false
+      }
+      if (this.mine) {
+        this.gameState.value.gameActive = false
+      }
+    }
+
+    this.mouseDown = false
+    this.reveal()
+  }
+
   setMouseDown(newValue: boolean): void {
     this.mouseDown = newValue
   }

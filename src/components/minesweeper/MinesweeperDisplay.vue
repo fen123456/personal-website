@@ -64,9 +64,12 @@ export default defineComponent({
 .imagesContainer {
   background-color: black;
   height: 29px;
+  border-color: var(--minesweeper3) var(--minesweeper1) var(--minesweeper3) var(--minesweeper1);
+  border-width: 2px;
+  border-style: solid;
 }
 .number {
   display: inline-block;
-  height: 29px;
+  height: 25px;
 }
 </style>

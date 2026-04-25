@@ -1,11 +1,13 @@
 <script lang="ts">
-import { computed, defineComponent, ref, type PropType } from 'vue'
+import { computed, defineComponent, ref, watch, type PropType } from 'vue'
 
 import Tile from '../composables/Tile'
 import MinesweeperTile from './MinesweeperTile.vue'
 import MinesweeperDisplay from './MinesweeperDisplay.vue'
 import { newTiles } from '../composables/newTiles'
 import { Timer } from '../composables/Timer'
+import { arrayEquals } from '../composables/arrayUtils'
+import type { GameState } from '../types/GameState'
 
 export default defineComponent({
   components: { MinesweeperTile, MinesweeperDisplay },
@@ -25,20 +27,29 @@ export default defineComponent({
   },
   setup(props) {
     const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mines))
-    const gameActive = ref<boolean>(true)
-    const timer = ref(new Timer())
-    const nextClickFirst = ref(true)
-    const mineCount = computed(() => {
-      return (
-        props.mines -
-        tiles.value.reduce(
-          (count, tileArray) =>
-            count +
-            tileArray.reduce((secondCount, tile) => secondCount + (tile.flagged ? 1 : 0), 0),
-          0,
+
+    const gameState = ref<GameState>({
+      gameActive: true,
+      nextClickFirst: true,
+      mineCount: computed(() => {
+        return (
+          props.mines -
+          tiles.value.reduce(
+            (count, row) =>
+              count + row.reduce((secondCount, tile) => secondCount + (tile.flagged ? 1 : 0), 0),
+            0,
+          )
         )
-      )
+      }),
+      gameWon: computed(() => {
+        return !tiles.value.some((row) => {
+          row.some((tile) => !tile.revealed && !tile.mine)
+        })
+      }),
     })
+
+    const timer = ref(new Timer())
+    // computed gameWon?
 
     function updateNumbers() {
       tiles.value.forEach((row) => {
@@ -55,55 +66,54 @@ export default defineComponent({
     }, 50)
 
     function gameOver(): void {
-      gameActive.value = false
+      gameState.value.gameActive = false
       timer.value.pause()
     }
 
     function newGame(): void {
-      gameActive.value = true
-      tiles.value = newTiles(props.width, props.height, props.mines)
+      gameState.value.gameActive = true
+      gameState.value.nextClickFirst = true
       timer.value.reset() // need a start in first click logic
-      nextClickFirst.value = true
+
+      tiles.value = newTiles(props.width, props.height, props.mines, gameState)
     }
 
     function firstClick(coordinate: [number, number]): void {
-      function randomTile(excludeY: number, excludeX: number): Tile {
+      function randomTile(excludeCoordinate: [number, number]): Tile {
         let newY = Math.floor(Math.random() * props.height)
         let newX = Math.floor(Math.random() * props.width)
-        while (newY == excludeY && newX == excludeX) {
+        while (arrayEquals([newY, newX], excludeCoordinate)) {
           newY = Math.floor(Math.random() * props.height)
           newX = Math.floor(Math.random() * props.width)
         }
-        console.log({ newY, newX })
         //@ts-expect-error Maybe I can set array bounds for TS
         return tiles.value[newY][newX]
       }
 
       timer.value.start()
-      const [i, j] = coordinate
       //@ts-expect-error man I know this is in range
       const currentTile = tiles.value[i][j] as Tile
       console.log(currentTile)
       if (currentTile.mine) {
         currentTile.mine = false
-        let newTile = randomTile(i, j)
+        let newTile = randomTile(coordinate)
         while (newTile.mine) {
-          newTile = randomTile(i, j)
+          newTile = randomTile(coordinate)
         }
         newTile.mine = true
         updateNumbers()
       }
-      nextClickFirst.value = false
+      gameState.value.nextClickFirst = false
     }
+
+    watch(gameState.value.gameActive, () => {})
 
     return {
       tiles,
       gameOver,
       newGame,
-      mineCount,
+      gameState,
       displayTime,
-      gameActive,
-      nextClickFirst,
       firstClick,
     }
   },
@@ -115,7 +125,7 @@ export default defineComponent({
     <div class="information minesweeperElement">
       <MinesweeperDisplay :number="displayTime" :digits="3" class="timer" />
       <button class="resetButton" @click="newGame">:)</button>
-      <MinesweeperDisplay :number="mineCount" :digits="3" class="minecount" />
+      <MinesweeperDisplay :number="gameState.mineCount" :digits="3" class="minecount" />
     </div>
     <div class="tilesContainer minesweeperElement">
       <div v-for="(row, i) in tiles" :key="i" class="row">
@@ -123,11 +133,7 @@ export default defineComponent({
           v-for="(tile, j) in row"
           :key="width * i + j"
           :tile="tile"
-          :gameActive="gameActive"
-          :firstClick="nextClickFirst"
           :coordinate="[i, j]"
-          @gameOver="gameOver"
-          @firstClick="firstClick($event)"
         />
       </div>
     </div>
@@ -140,12 +146,13 @@ export default defineComponent({
   border-style: solid;
   border-color: var(--minesweeper3) var(--minesweeper1) var(--minesweeper1) var(--minesweeper3);
   border-width: 5px;
+  padding: 5px;
 }
 .minesweeperElement {
   border-color: var(--minesweeper1) var(--minesweeper3) var(--minesweeper3) var(--minesweeper1);
   border-style: solid;
   border-width: 5px;
-  margin: 10px 5px;
+  margin: 5px;
 }
 
 .row {
@@ -154,7 +161,6 @@ export default defineComponent({
 }
 
 .information {
-  height: m-content;
   padding: 3px;
 }
 .timer {

@@ -1,7 +1,14 @@
+import type { Ref } from 'vue'
+import type { GameState } from '../types/GameState'
 import { arrayIncludes2D } from './arrayUtils'
 import Tile from './Tile'
 
-export function newTiles(width: number, height: number, mineCount: number): Tile[][] {
+export function newTiles(
+  width: number,
+  height: number,
+  mineCount: number,
+  gameState: Ref<GameState> | null = null,
+): Tile[][] {
   const newCoords: [number, number] = Array<number>(2) as [number, number]
   const mineCoordinates: [number, number][] = []
   const tiles = Array<Tile[]>(height)
@@ -20,7 +27,7 @@ export function newTiles(width: number, height: number, mineCount: number): Tile
     tiles[i] = Array.from({ length: width })
     for (let j = 0; j < width; j++) {
       //@ts-expect-error ts doesn't recognise that tiles[i] is definitely an array.
-      tiles[i][j] = new Tile(arrayIncludes2D(mineCoordinates, [i, j]))
+      tiles[i][j] = new Tile(arrayIncludes2D(mineCoordinates, [i, j]), gameState)
     }
   }
 
