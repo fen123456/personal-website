@@ -1,7 +1,6 @@
-<script lang="ts">
-import { computed, defineComponent, ref, watch, type PropType } from 'vue'
+<script setup lang="ts">
+import { computed, ref, type PropType } from 'vue'
 
-import Tile from '../composables/Tile'
 import MinesweeperTile from './MinesweeperTile.vue'
 import MinesweeperDisplay from './MinesweeperDisplay.vue'
 import { newTiles } from '../composables/newTiles'
@@ -9,115 +8,100 @@ import { Timer } from '../composables/Timer'
 import { arrayEquals } from '../composables/arrayUtils'
 import type { GameState } from '../types/GameState'
 
-export default defineComponent({
-  components: { MinesweeperTile, MinesweeperDisplay },
-  props: {
-    width: {
-      required: true,
-      type: Number as PropType<number>,
-    },
-    height: {
-      required: true,
-      type: Number as PropType<number>,
-    },
-    mines: {
-      required: true,
-      type: Number as PropType<number>,
-    },
+const props = defineProps({
+  width: {
+    required: true,
+    type: Number as PropType<number>,
   },
-  setup(props) {
-    const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mines))
-
-    const gameState = ref<GameState>({
-      gameActive: true,
-      nextClickFirst: true,
-      mineCount: computed(() => {
-        return (
-          props.mines -
-          tiles.value.reduce(
-            (count, row) =>
-              count + row.reduce((secondCount, tile) => secondCount + (tile.flagged ? 1 : 0), 0),
-            0,
-          )
-        )
-      }),
-      gameWon: computed(() => {
-        return !tiles.value.some((row) => {
-          row.some((tile) => !tile.revealed && !tile.mine)
-        })
-      }),
-    })
-
-    const timer = ref(new Timer())
-    // computed gameWon?
-
-    function updateNumbers() {
-      tiles.value.forEach((row) => {
-        row.forEach((tile) => {
-          tile.updateNumber()
-        })
-      })
-    }
-
-    // time :D
-    const displayTime = ref(0)
-    setInterval(() => {
-      displayTime.value = Math.floor(timer.value.getTime() / 1000)
-    }, 50)
-
-    function gameOver(): void {
-      gameState.value.gameActive = false
-      timer.value.pause()
-    }
-
-    function newGame(): void {
-      gameState.value.gameActive = true
-      gameState.value.nextClickFirst = true
-      timer.value.reset() // need a start in first click logic
-
-      tiles.value = newTiles(props.width, props.height, props.mines, gameState)
-    }
-
-    function firstClick(coordinate: [number, number]): void {
-      function randomTile(excludeCoordinate: [number, number]): Tile {
-        let newY = Math.floor(Math.random() * props.height)
-        let newX = Math.floor(Math.random() * props.width)
-        while (arrayEquals([newY, newX], excludeCoordinate)) {
-          newY = Math.floor(Math.random() * props.height)
-          newX = Math.floor(Math.random() * props.width)
-        }
-        //@ts-expect-error Maybe I can set array bounds for TS
-        return tiles.value[newY][newX]
-      }
-
-      timer.value.start()
-      //@ts-expect-error man I know this is in range
-      const currentTile = tiles.value[i][j] as Tile
-      console.log(currentTile)
-      if (currentTile.mine) {
-        currentTile.mine = false
-        let newTile = randomTile(coordinate)
-        while (newTile.mine) {
-          newTile = randomTile(coordinate)
-        }
-        newTile.mine = true
-        updateNumbers()
-      }
-      gameState.value.nextClickFirst = false
-    }
-
-    watch(gameState.value.gameActive, () => {})
-
-    return {
-      tiles,
-      gameOver,
-      newGame,
-      gameState,
-      displayTime,
-      firstClick,
-    }
+  height: {
+    required: true,
+    type: Number as PropType<number>,
+  },
+  mines: {
+    required: true,
+    type: Number as PropType<number>,
   },
 })
+
+const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mines))
+
+const gameState = ref<GameState>({
+  gameActive: true,
+  nextClickFirst: true,
+  mineCount: computed(() => {
+    return (
+      props.mines -
+      tiles.value.reduce(
+        (count, row) =>
+          count + row.reduce((secondCount, tile) => secondCount + (tile.flagged ? 1 : 0), 0),
+        0,
+      )
+    )
+  }),
+  gameWon: computed(() => {
+    return !tiles.value.some((row) => {
+      row.some((tile) => !tile.revealed && !tile.mine)
+    })
+  }),
+})
+
+const timer = ref(new Timer())
+// computed gameWon?
+
+function updateNumbers() {
+  tiles.value.forEach((row) => {
+    row.forEach((tile) => {
+      tile.updateNumber()
+    })
+  })
+}
+
+// time :D
+const displayTime = ref(0)
+setInterval(() => {
+  displayTime.value = Math.floor(timer.value.getTime() / 1000)
+}, 50)
+
+function gameOver(): void {
+  gameState.value.gameActive = false
+  timer.value.pause()
+}
+
+function newGame(): void {
+  gameState.value.gameActive = true
+  gameState.value.nextClickFirst = true
+  timer.value.reset() // need a start in first click logic
+
+  tiles.value = newTiles(props.width, props.height, props.mines, gameState)
+}
+
+function firstClick(coordinate: [number, number]): void {
+  function randomTile(excludeCoordinate: [number, number]): Tile {
+    let newY = Math.floor(Math.random() * props.height)
+    let newX = Math.floor(Math.random() * props.width)
+    while (arrayEquals([newY, newX], excludeCoordinate)) {
+      newY = Math.floor(Math.random() * props.height)
+      newX = Math.floor(Math.random() * props.width)
+    }
+    //@ts-expect-error Maybe I can set array bounds for TS
+    return tiles.value[newY][newX]
+  }
+
+  timer.value.start()
+  //@ts-expect-error man I know this is in range
+  const currentTile = tiles.value[i][j] as Tile
+  console.log(currentTile)
+  if (currentTile.mine) {
+    currentTile.mine = false
+    let newTile = randomTile(coordinate)
+    while (newTile.mine) {
+      newTile = randomTile(coordinate)
+    }
+    newTile.mine = true
+    updateNumbers()
+  }
+  gameState.value.nextClickFirst = false
+}
 </script>
 
 <template>
@@ -132,8 +116,8 @@ export default defineComponent({
         <MinesweeperTile
           v-for="(tile, j) in row"
           :key="width * i + j"
-          :tile="tile"
           :coordinate="[i, j]"
+          :mine="mines[i][j]"
         />
       </div>
     </div>
