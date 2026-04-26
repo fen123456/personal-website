@@ -7,6 +7,8 @@ export function arrayIncludes2D(arr1: unknown[][], arr2: unknown[]): boolean {
 }
 
 export function randomMask2D(height: number, width: number, count: number): boolean[][] {
+  count = Math.min(count, width * height)
+
   const newCoords: [number, number] = Array<number>(2) as [number, number]
   const maskCoords: [number, number][] = []
   const mask = Array<boolean[]>(height)
@@ -25,7 +27,7 @@ export function randomMask2D(height: number, width: number, count: number): bool
     mask[i] = Array<boolean>(width)
     for (let j = 0; j < width; j++) {
       //@ts-expect-error ts doesn't recognise that tiles[i] is definitely an array.
-      mask[i][j] = arrayIncludes2D(mineCoordinates, [i, j])
+      mask[i][j] = arrayIncludes2D(maskCoords, [i, j])
     }
   }
 

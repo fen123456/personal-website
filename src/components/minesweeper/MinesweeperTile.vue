@@ -17,7 +17,7 @@ import tileExploded from '@/assets/minesweeper_tiles/tileExploded.svg'
 import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
 
 import { computed, ref, type PropType } from 'vue'
-import type { GameState } from '../types/GameState'
+import type { GameStateReadOnly } from '../types/GameState'
 // import MinesweeperTile from './MinesweeperTile.vue'
 import { ClearMethod } from '../types/ClearMethod'
 
@@ -37,7 +37,7 @@ const props = defineProps({
   },
   gameState: {
     required: false,
-    type: Object as PropType<GameState>,
+    type: Object as PropType<GameStateReadOnly>,
   },
   neighbours: {
     required: false,
@@ -53,14 +53,11 @@ const flagged = ref<boolean>(false)
 const mouseDown = ref<boolean>(false)
 
 const number = computed(() => {
-  return props.neighbours.reduce(
-    (number, currentTile) => number + (currentTile.props.mine ? 1 : 0),
-    0,
-  )
+  return props.neighbours.reduce((number, neighbour) => number + (neighbour.props.mine ? 1 : 0), 0)
 })
 
 const flagNeighbours = computed(() => {
-  return props.neighbours.reduce((number, currentTile) => number + (currentTile.flagged ? 1 : 0), 0)
+  return props.neighbours.reduce((number, neighbour) => number + (neighbour.flagged ? 1 : 0), 0)
 })
 
 const gameActive = computed(() => {
@@ -70,8 +67,8 @@ const sprite = computed(() => {
   // click preview
   if (!revealed.value && !flagged.value && gameActive.value) {
     if (
-      props.neighbours.some((neighbour) => neighbour.mouseDown.value && neighbour.revealed.value) ||
-      mouseDown
+      props.neighbours.some((neighbour) => neighbour.mouseDown && neighbour.revealed) ||
+      mouseDown.value
     ) {
       return tile0
     }
@@ -123,14 +120,19 @@ function toggleFlag(): void {
     return
   }
 
-  flagged.value = !flagged.value && revealed.value
+  flagged.value = !flagged.value && !revealed.value
 }
 
 function handleLeftClick(): void {
-  emit('leftClick', props.mine)
+  emit('leftClick', props.coordinate)
 
   mouseDown.value = false
   reveal()
+}
+
+function reset(): void {
+  revealed.value = false
+  flagged.value = false
 }
 
 defineExpose({
@@ -140,6 +142,7 @@ defineExpose({
   number,
   props,
   reveal,
+  reset,
 })
 </script>
 

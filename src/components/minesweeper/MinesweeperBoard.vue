@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, type PropType } from 'vue'
+import { computed, onMounted, ref, type PropType } from 'vue'
 
 import MinesweeperTile from './MinesweeperTile.vue'
 import MinesweeperDisplay from './MinesweeperDisplay.vue'
-import { newTiles } from '../composables/newTiles'
 import { Timer } from '../composables/Timer'
-import { arrayEquals } from '../composables/arrayUtils'
-import type { GameState } from '../types/GameState'
+import { arrayEquals, randomMask2D } from '../composables/arrayUtils'
+import type { GameStateReactive } from '../types/GameState'
+
+type MinesweeperTileRef = InstanceType<typeof MinesweeperTile>
 
 const props = defineProps({
-  width: {
+  height: {
     required: true,
     type: Number as PropType<number>,
   },
-  height: {
+  width: {
     required: true,
     type: Number as PropType<number>,
   },
@@ -23,38 +24,40 @@ const props = defineProps({
   },
 })
 
-const tiles = ref<Tile[][]>(newTiles(props.width, props.height, props.mines))
+const mines = ref(randomMask2D(props.height, props.width, props.mines))
 
-const gameState = ref<GameState>({
-  gameActive: true,
+const tiles = ref<MinesweeperTileRef[][]>(Array.from({ length: props.height }))
+for (let i = 0; i < props.height; i++) {
+  tiles.value[i] = Array.from({ length: props.width })
+}
+
+const neighbours = ref<MinesweeperTileRef[][][]>(Array.from({ length: props.height }))
+for (let i = 0; i < props.height; i++) {
+  neighbours.value[i] = Array.from({ length: props.width })
+  for (let j = 0; j < props.width; j++) {
+    //@ts-expect-error coordinates always in bounds.
+    neighbours.value[i][j] = []
+  }
+}
+
+// computed values get actually set on mount once I can work with the tile refs.
+const gameState = ref<GameStateReactive>({
   nextClickFirst: true,
   mineCount: computed(() => {
-    return (
-      props.mines -
-      tiles.value.reduce(
-        (count, row) =>
-          count + row.reduce((secondCount, tile) => secondCount + (tile.flagged ? 1 : 0), 0),
-        0,
-      )
-    )
+    return props.mines
   }),
   gameWon: computed(() => {
-    return !tiles.value.some((row) => {
-      row.some((tile) => !tile.revealed && !tile.mine)
-    })
+    return false
+  }),
+  gameLost: computed(() => {
+    return false
+  }),
+  gameActive: computed(() => {
+    return true
   }),
 })
 
 const timer = ref(new Timer())
-// computed gameWon?
-
-function updateNumbers() {
-  tiles.value.forEach((row) => {
-    row.forEach((tile) => {
-      tile.updateNumber()
-    })
-  })
-}
 
 // time :D
 const displayTime = ref(0)
@@ -68,18 +71,19 @@ function gameOver(): void {
 }
 
 function newGame(): void {
-  gameState.value.gameActive = true
   gameState.value.nextClickFirst = true
-  timer.value.reset() // need a start in first click logic
+  timer.value.reset()
 
-  tiles.value = newTiles(props.width, props.height, props.mines, gameState)
+  mines.value = randomMask2D(props.height, props.width, props.mines)
+  tiles.value.forEach((row) => row.forEach((tile) => tile.reset()))
 }
 
 function firstClick(coordinate: [number, number]): void {
-  function randomTile(excludeCoordinate: [number, number]): Tile {
+  function randomTile(excludeCoordinate: [number, number]): MinesweeperTileRef {
     let newY = Math.floor(Math.random() * props.height)
     let newX = Math.floor(Math.random() * props.width)
-    while (arrayEquals([newY, newX], excludeCoordinate)) {
+    //@ts-expect-error tiles coord in bounds.
+    while (arrayEquals([newY, newX], excludeCoordinate) && tiles[newY][newX].props.mine) {
       newY = Math.floor(Math.random() * props.height)
       newX = Math.floor(Math.random() * props.width)
     }
@@ -88,8 +92,8 @@ function firstClick(coordinate: [number, number]): void {
   }
 
   timer.value.start()
-  //@ts-expect-error man I know this is in range
-  const currentTile = tiles.value[i][j] as Tile
+  //@ts-expect-error another index issue!
+  const currentTile = tiles.value[coordinate[0]][coordinate[1]] as MinesweeperTileRef
   console.log(currentTile)
   if (currentTile.mine) {
     currentTile.mine = false
@@ -98,10 +102,61 @@ function firstClick(coordinate: [number, number]): void {
       newTile = randomTile(coordinate)
     }
     newTile.mine = true
-    updateNumbers()
   }
   gameState.value.nextClickFirst = false
 }
+
+function handleLeftClick(coordinate: [number, number]): void {
+  if (gameState.value.nextClickFirst) {
+    firstClick(coordinate)
+  }
+}
+
+function handleRightClick() {}
+
+onMounted(() => {
+  // this was throwing a fit at me if I started looking for minecount and gameWon before mounting.
+  gameState.value = {
+    nextClickFirst: true,
+    mineCount: computed(() => {
+      return (
+        props.mines -
+        tiles.value.reduce(
+          (count, row) =>
+            count + row.reduce((secondCount, tile) => secondCount + (tile.flagged ? 1 : 0), 0),
+          0,
+        )
+      )
+    }),
+    gameWon: computed(() => {
+      return !tiles.value.some((row) => {
+        row.some((tile) => !tile.revealed && !tile.mine)
+      })
+    }),
+    gameLost: computed(() => {
+      return tiles.value.some((row) => {
+        row.some((tile) => tile.revealed && tile.mine)
+      })
+    }),
+    gameActive: computed(() => {
+      return !(gameState.value.gameWon || gameState.value.gameLost)
+    }),
+  }
+
+  // neighbour assignment can only be done once tiles is all assigned.
+  for (let i = 0; i < props.height; i++) {
+    for (let j = 0; j < props.width; j++) {
+      for (let k = Math.max(i - 1, 0); k < Math.min(i + 2, props.height); k++) {
+        for (let l = Math.max(j - 1, 0); l < Math.min(j + 2, props.width); l++) {
+          if (!(k === i && l === j)) {
+            //@ts-expect-error ts doesn't recognise that we are definitely in range here.
+            neighbours.value[i][j].push(tiles.value[k][l])
+          }
+        }
+      }
+    }
+  }
+})
 </script>
 
 <template>
@@ -112,12 +167,17 @@ function firstClick(coordinate: [number, number]): void {
       <MinesweeperDisplay :number="gameState.mineCount" :digits="3" class="minecount" />
     </div>
     <div class="tilesContainer minesweeperElement">
-      <div v-for="(row, i) in tiles" :key="i" class="row">
+      <div v-for="(row, i) in mines" :key="i" class="row">
         <MinesweeperTile
-          v-for="(tile, j) in row"
+          v-for="(mine, j) in row"
           :key="width * i + j"
           :coordinate="[i, j]"
-          :mine="mines[i][j]"
+          :mine="mine"
+          :neighbours="neighbours[i][j]"
+          :ref="(element) => (tiles[i][j] = element)"
+          :game-state="gameState"
+          @left-click="handleLeftClick"
+          @right-click="handleRightClick"
         />
       </div>
     </div>
