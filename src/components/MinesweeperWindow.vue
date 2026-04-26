@@ -1,15 +1,10 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 import WindowFrame from './WindowFrame.vue'
 import MinesweeperBoard from './minesweeper/MinesweeperBoard.vue'
 
-export default defineComponent({
-  name: 'MinesweeperWindow',
-  components: { WindowFrame, MinesweeperBoard },
-  setup() {
-    return { width: 9, height: 9, mineCount: 10 }
-  },
-})
+const width = 9
+const height = 9
+const mineCount = 10
 </script>
 
 <template>

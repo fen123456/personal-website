@@ -1,12 +1,6 @@
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 import TextWindow from '@/components/TextWindow.vue'
 import MinesweeperWindow from '@/components/MinesweeperWindow.vue'
-
-export default defineComponent({
-  name: 'HomeView',
-  components: { TextWindow, MinesweeperWindow },
-})
 </script>
 
 <template>

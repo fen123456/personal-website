@@ -1,33 +1,28 @@
-<script lang="ts">
-import { defineComponent, ref, type PropType } from 'vue'
+<script setup lang="ts">
+import { ref, type PropType } from 'vue'
 import notepadIcon from '../assets/icons/notepad-4.png'
 import minesweeperIcon from '../assets/icons/minesweeper-1.png'
 
-export default defineComponent({
-  name: 'WindowFrame',
-  props: {
-    title: {
-      required: true,
-      type: String as PropType<string>,
-    },
-    icon: {
-      required: false,
-      type: String as PropType<string>,
-      default: '',
-    },
+const props = defineProps({
+  title: {
+    required: true,
+    type: String as PropType<string>,
   },
-  setup(props) {
-    const sources: {
-      [key: string]: string
-    } = {
-      notepad: notepadIcon,
-      minesweeper: minesweeperIcon,
-    }
-    const src = ref<string>('')
-    src.value = sources[props.icon] ?? notepadIcon
-    return { src }
+  icon: {
+    required: false,
+    type: String as PropType<string>,
+    default: '',
   },
 })
+
+const sources: {
+  [key: string]: string
+} = {
+  notepad: notepadIcon,
+  minesweeper: minesweeperIcon,
+}
+const src = ref<string>('')
+src.value = sources[props.icon] ?? notepadIcon
 </script>
 
 <template>
