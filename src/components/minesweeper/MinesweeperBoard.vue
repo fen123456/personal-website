@@ -213,6 +213,7 @@ onMounted(() => {
     </div>
     <div class="tilesContainer minesweeperElement">
       <div v-for="(row, i) in mines" :key="i" class="row">
+        <!-- @vue-expect-error indexes arent happy with me -->
         <MinesweeperTile
           v-for="(mine, j) in row"
           :key="width * i + j"
