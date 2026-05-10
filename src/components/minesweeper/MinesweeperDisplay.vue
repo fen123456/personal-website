@@ -29,6 +29,7 @@ const props = defineProps({
 function getImageList(number: number, digits: number): Array<string> {
   let outString = number.toString()
 
+  // adding 0s to fill up display to digit count.
   const toAdd = '0'.repeat(digits - outString.length)
   if (number < 0) {
     outString = outString.substring(0, 1) + toAdd + outString.substring(1)
@@ -37,6 +38,7 @@ function getImageList(number: number, digits: number): Array<string> {
   }
   const out = [] as Array<string>
 
+  // setting up array of images
   outString.split('').forEach((char) => {
     out.push(numberImages[Number(char)] ?? imgDash)
   })

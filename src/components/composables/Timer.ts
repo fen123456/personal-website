@@ -12,8 +12,7 @@ export class Timer {
     const currentTime = Date.now()
     const delta = currentTime - this.lastAccessed
     this.lastAccessed = currentTime
-    this.time = this.active ? this.time + delta : this.time
-
+    this.time = this.time + (this.active ? delta : 0)
     return this.time
   }
   pause(): void {

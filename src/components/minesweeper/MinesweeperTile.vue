@@ -19,7 +19,6 @@ import tileMine from '@/assets/minesweeper_tiles/tileMine.svg'
 import { computed, ref, type PropType } from 'vue'
 import type { GameStateReadOnly } from '../types/GameState'
 // import MinesweeperTile from './MinesweeperTile.vue'
-import { ClearMethod } from '../types/ClearMethod'
 
 // I wish I could type self-referentially as below but this will have to do?
 // type MinesweeperTileRef = InstanceType<typeof MinesweeperTile>
@@ -46,18 +45,17 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['leftClick', 'rightClick'])
-
+// refs + computed values
 const revealed = ref<boolean>(false)
 const flagged = ref<boolean>(false)
 const mouseDown = ref<boolean>(false)
 
 const number = computed(() => {
-  return props.neighbours.reduce((number, neighbour) => number + (neighbour.props.mine ? 1 : 0), 0)
+  return props.neighbours.reduce((count, neighbour) => count + (neighbour.props.mine ? 1 : 0), 0)
 })
 
 const flagNeighbours = computed(() => {
-  return props.neighbours.reduce((number, neighbour) => number + (neighbour.flagged ? 1 : 0), 0)
+  return props.neighbours.reduce((count, neighbour) => count + (neighbour.flagged ? 1 : 0), 0)
 })
 
 const gameActive = computed(() => {
@@ -82,40 +80,17 @@ const sprite = computed(() => {
       return numberTiles[number.value] ?? tile0
     }
   } else {
-    if (!gameActive.value && props.mine) {
+    if (!gameActive.value && props.mine && !flagged.value) {
       return tileMine
     }
     return flagged.value ? tileFlagged : tileUncleared
   }
 })
 
-function reveal(clearMethod = ClearMethod.direct): void {
-  // setting up booleans
-  const cascade = !revealed.value && number.value === 0 && !props.mine
+// click functions
+const emit = defineEmits(['leftClick', 'rightClick'])
 
-  const chord =
-    revealed.value &&
-    flagNeighbours.value === number.value &&
-    number.value !== 0 &&
-    clearMethod === ClearMethod.direct
-  // chording
-  if (chord) {
-    props.neighbours.forEach((tile) => tile.reveal(ClearMethod.chord))
-  }
-
-  // reveal number. unflag if cascading 0s cleared it.
-  if (!flagged.value || clearMethod == ClearMethod.cascade) {
-    revealed.value = true
-    flagged.value = false
-  }
-
-  // cascading 0s
-  if (cascade) {
-    props.neighbours.forEach((tile) => tile.reveal(ClearMethod.cascade))
-  }
-}
-
-function toggleFlag(): void {
+function handleRightClick(): void {
   if (!gameActive.value) {
     return
   }
@@ -124,10 +99,12 @@ function toggleFlag(): void {
 }
 
 function handleLeftClick(): void {
+  if (!gameActive.value) {
+    return
+  }
   emit('leftClick', props.coordinate)
 
   mouseDown.value = false
-  reveal()
 }
 
 function reset(): void {
@@ -135,14 +112,24 @@ function reset(): void {
   flagged.value = false
 }
 
+function setRevealed(newValue: boolean): void {
+  revealed.value = newValue
+}
+
+function setFlagged(newValue: boolean): void {
+  flagged.value = newValue
+}
+
 defineExpose({
   revealed,
   flagged,
   mouseDown,
   number,
+  flagNeighbours,
   props,
-  reveal,
   reset,
+  setRevealed,
+  setFlagged,
 })
 </script>
 
@@ -151,9 +138,9 @@ defineExpose({
     class="tileSprite preventSelect"
     :src="sprite"
     alt=""
-    @mouseup.left="handleLeftClick()"
+    @mouseup.left="handleLeftClick"
     @mousedown.left="mouseDown = true"
-    @mousedown.right="toggleFlag"
+    @mousedown.right="handleRightClick"
     @mouseenter="mouseDown = $event.buttons === 1"
     @mouseleave="mouseDown = false"
     oncontextmenu="return false"

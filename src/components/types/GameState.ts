@@ -5,7 +5,7 @@ export interface GameStateReactive {
   nextClickFirst: boolean
   mineCount: ComputedRef<number>
   gameWon: ComputedRef<boolean>
-  gameLost: ComputedRef<boolean>
+  gameLost: boolean
   gameActive: ComputedRef<boolean>
 }
 

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import TextWindow from '@/components/TextWindow.vue'
-import MinesweeperWindow from '@/components/MinesweeperWindow.vue'
+import MinesweeperWindow from '@/components/minesweeper/MinesweeperWindow.vue'
 </script>
 
 <template>
+  <MinesweeperWindow />
   <TextWindow title="Hello!">
     <p>
       Lorem ipsum dolor sit amet consectetur adipisicing elit. Sit blanditiis voluptates corporis
@@ -18,7 +19,6 @@ import MinesweeperWindow from '@/components/MinesweeperWindow.vue'
     <p>Second line</p>
     <p></p>
   </TextWindow>
-  <MinesweeperWindow />
 </template>
 
 <style scoped>
